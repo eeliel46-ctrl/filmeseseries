@@ -1,0 +1,9 @@
+{
+  "/api/content/popular/route": "app/api/content/popular/route.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/page": "app/page.js",
+  "/api/content/trending/route": "app/api/content/trending/route.js",
+  "/api/favorites/route": "app/api/favorites/route.js",
+  "/api/content/discover/route": "app/api/content/discover/route.js",
+  "/series/page": "app/series/page.js"
+}

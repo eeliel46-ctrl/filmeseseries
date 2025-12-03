@@ -68,20 +68,20 @@ export function SeasonEpisodeModal({
       try {
         const tmdbId = content.tmdbId || content.id
         console.log('Fetching seasons for TMDB ID:', tmdbId)
-        
+
         const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY || process.env.TMDB_API_KEY
         const response = await fetch(
           `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${apiKey}&language=pt-BR`
         )
         const data = await response.json()
-        
+
         console.log('Seasons data:', data)
-        
+
         if (data.seasons) {
           const filteredSeasons = data.seasons.filter((s: Season) => s.season_number > 0)
           console.log('Filtered seasons:', filteredSeasons)
           setSeasons(filteredSeasons)
-          
+
           if (filteredSeasons.length > 0) {
             setSelectedSeason(filteredSeasons[0].season_number)
             fetchEpisodes(filteredSeasons[0].season_number)
@@ -101,19 +101,19 @@ export function SeasonEpisodeModal({
     if (!content) return
 
     setLoadingEpisodes(true)
-    
+
     try {
       const tmdbId = content.tmdbId || content.id
       console.log('Fetching episodes for season:', seasonNumber)
-      
+
       const apiKey = process.env.NEXT_PUBLIC_TMDB_API_KEY || process.env.TMDB_API_KEY
       const response = await fetch(
         `https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNumber}?api_key=${apiKey}&language=pt-BR`
       )
       const data = await response.json()
-      
+
       console.log('Episodes data:', data)
-      
+
       if (data.episodes) {
         setEpisodes(data.episodes)
       }
@@ -137,10 +137,10 @@ export function SeasonEpisodeModal({
     if (!dateString) return ''
     try {
       const date = new Date(dateString)
-      return date.toLocaleDateString('pt-BR', { 
-        day: '2-digit', 
-        month: 'short', 
-        year: 'numeric' 
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
       }).replace('.', '')
     } catch {
       return dateString
@@ -195,11 +195,10 @@ export function SeasonEpisodeModal({
                     <button
                       key={season.season_number}
                       onClick={() => handleSeasonClick(season.season_number)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-md transition-all ${
-                        selectedSeason === season.season_number 
-                          ? 'bg-red-600 text-white' 
+                      className={`flex items-center justify-between px-4 py-3 rounded-md transition-all ${selectedSeason === season.season_number
+                          ? 'bg-red-600 text-white'
                           : 'bg-[#1a1a1a] text-gray-300 hover:bg-[#2a2a2a]'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center space-x-3">
                         <div className="flex items-center justify-center w-10 h-10 rounded-md bg-black/30 text-lg font-bold">
@@ -232,7 +231,7 @@ export function SeasonEpisodeModal({
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
                 </div>
               ) : episodes.length > 0 ? (
-                <div className="space-y-3">
+                <div className="max-h-[400px] overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-red-600 scrollbar-track-gray-800">
                   {episodes.map((episode) => (
                     <div
                       key={episode.episode_number}
@@ -256,7 +255,7 @@ export function SeasonEpisodeModal({
                           <Play className="w-8 h-8 text-white" />
                         </div>
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start space-x-2 mb-1">
                           <span className="text-gray-400 text-sm font-semibold mt-0.5">
