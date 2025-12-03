@@ -1,12 +1,10 @@
 
 import { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './db'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
@@ -57,6 +55,15 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
   },
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Prevents redirect loops by ensuring we don't redirect to signin if we're already there
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`
+      } else if (new URL(url).origin === baseUrl) {
+        return url
+      }
+      return baseUrl
+    },
     async jwt({ token, user }) {
       if (user) {
         token.firstName = (user as any).firstName

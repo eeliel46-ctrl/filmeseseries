@@ -1,7 +1,9 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Header } from '@/components/layout/header'
 import { HeroBanner } from '@/components/ui/hero-banner'
 import { ContentRow } from '@/components/ui/content-row'
@@ -13,12 +15,21 @@ import { useFavorites } from '@/hooks/use-favorites'
 import { ContentItem } from '@/lib/types'
 
 export function HomeClient() {
+  const { data: session, status } = useSession() || {}
+  const router = useRouter()
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null)
   const [showPlayer, setShowPlayer] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
   const [showSeasonEpisode, setShowSeasonEpisode] = useState(false)
   const [selectedSeason, setSelectedSeason] = useState(1)
   const [selectedEpisode, setSelectedEpisode] = useState(1)
+
+  // Redirect to signin if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace('/auth/signin')
+    }
+  }, [status, router])
 
   // Fetch different content categories
   const { contents: trendingMovies, loading: loadingTrending } = useContent({
@@ -93,6 +104,23 @@ export function HomeClient() {
 
   // Get hero content (first 5 trending movies)
   const heroContents = trendingMovies?.slice(0, 5) || []
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-lg">Carregando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (status === 'unauthenticated') {
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-black">

@@ -1,8 +1,8 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, User, Lock } from 'lucide-react'
@@ -22,17 +22,6 @@ export default function SignInPage() {
   
   const callbackUrl = searchParams?.get('callbackUrl') || '/'
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const session = await getSession()
-      if (session) {
-        router.replace('/')
-      }
-    }
-    checkSession()
-  }, [router])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -44,22 +33,15 @@ export default function SignInPage() {
     setLoading(true)
 
     try {
-      const result = await signIn('credentials', {
+      // Let NextAuth handle the redirect - this prevents timing issues with session
+      await signIn('credentials', {
         email,
         password,
-        redirect: false,
+        callbackUrl: callbackUrl,
       })
-
-      if (result?.error) {
-        toast.error('Email ou senha incorretos')
-      } else {
-        toast.success('Login realizado com sucesso!')
-        router.push(callbackUrl)
-      }
     } catch (error) {
       console.error('SignIn error:', error)
       toast.error('Erro ao fazer login')
-    } finally {
       setLoading(false)
     }
   }

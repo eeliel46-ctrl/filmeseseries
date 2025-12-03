@@ -1,8 +1,8 @@
 
 'use client'
 
-import { useState, useEffect } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, User, Lock, Mail, UserCheck } from 'lucide-react'
@@ -24,17 +24,6 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const session = await getSession()
-      if (session) {
-        router.replace('/')
-      }
-    }
-    checkSession()
-  }, [router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -83,21 +72,15 @@ export default function SignUpPage() {
       const data = await response.json()
 
       if (response.ok) {
-        toast.success('Conta criada com sucesso!')
+        toast.success('Conta criada com sucesso! Fazendo login...')
         
         // Auto sign-in after successful registration
-        const result = await signIn('credentials', {
+        // Let NextAuth handle the redirect - this prevents timing issues with session
+        await signIn('credentials', {
           email,
           password,
-          redirect: false,
+          callbackUrl: '/',
         })
-
-        if (result?.error) {
-          toast.error('Conta criada, mas erro no login automático')
-          router.push('/auth/signin')
-        } else {
-          router.push('/')
-        }
       } else {
         toast.error(data.error || 'Erro ao criar conta')
       }
