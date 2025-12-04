@@ -60,6 +60,16 @@ export default function MyListPage() {
     setSelectedContent(null)
   }
 
+  const closePlayer = () => {
+    setShowPlayer(false)
+    setSelectedContent(null)
+  }
+
+  const closeDetails = () => {
+    setShowDetails(false)
+    setSelectedContent(null)
+  }
+
   const handleViewDetails = (content: ContentItem) => {
     setSelectedContent(content)
     
@@ -245,7 +255,7 @@ export default function MyListPage() {
 
       <VideoPlayerModal
         isOpen={showPlayer}
-        onClose={() => setShowPlayer(false)}
+        onClose={closePlayer}
         content={selectedContent}
         season={selectedSeason}
         episode={selectedEpisode}
@@ -253,7 +263,7 @@ export default function MyListPage() {
 
       <ContentDetailsModal
         isOpen={showDetails}
-        onClose={() => setShowDetails(false)}
+        onClose={closeDetails}
         content={selectedContent}
         onPlay={handlePlay}
         onAddToList={handleAddToList}
