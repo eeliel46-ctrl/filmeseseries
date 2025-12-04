@@ -90,7 +90,13 @@ export default function SeriesPage() {
 
   const handleViewDetails = (content: ContentItem) => {
     setSelectedContent(content)
-    setShowDetails(true)
+    
+    // Se for série ou anime, mostrar seletor de temporada/episódio diretamente
+    if (content.type === 'series' || content.type === 'anime') {
+      setShowSeasonEpisode(true)
+    } else {
+      setShowDetails(true)
+    }
   }
 
   const handleAddToList = async (content: ContentItem) => {

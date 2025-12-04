@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/header'
 import { ContentCard } from '@/components/ui/content-card'
 import { VideoPlayerModal } from '@/components/ui/video-player-modal'
 import { ContentDetailsModal } from '@/components/ui/content-details-modal'
+import { SeasonEpisodeModal } from '@/components/ui/season-episode-modal'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -23,6 +24,9 @@ export default function MyListPage() {
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null)
   const [showPlayer, setShowPlayer] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
+  const [showSeasonEpisode, setShowSeasonEpisode] = useState(false)
+  const [selectedSeason, setSelectedSeason] = useState(1)
+  const [selectedEpisode, setSelectedEpisode] = useState(1)
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'year' | 'rating'>('date')
 
   const {
@@ -35,12 +39,36 @@ export default function MyListPage() {
 
   const handlePlay = (content: ContentItem) => {
     setSelectedContent(content)
+    
+    // Se for série ou anime, mostrar seletor de temporada/episódio
+    if (content.type === 'series' || content.type === 'anime') {
+      setShowSeasonEpisode(true)
+    } else {
+      setShowPlayer(true)
+    }
+  }
+
+  const handlePlayEpisode = (season: number, episode: number) => {
+    setSelectedSeason(season)
+    setSelectedEpisode(episode)
+    setShowSeasonEpisode(false)
     setShowPlayer(true)
+  }
+
+  const closeSeasonEpisode = () => {
+    setShowSeasonEpisode(false)
+    setSelectedContent(null)
   }
 
   const handleViewDetails = (content: ContentItem) => {
     setSelectedContent(content)
-    setShowDetails(true)
+    
+    // Se for série ou anime, mostrar seletor de temporada/episódio diretamente
+    if (content.type === 'series' || content.type === 'anime') {
+      setShowSeasonEpisode(true)
+    } else {
+      setShowDetails(true)
+    }
   }
 
   const handleAddToList = async (content: ContentItem) => {
@@ -208,10 +236,19 @@ export default function MyListPage() {
       </main>
 
       {/* Modals */}
+      <SeasonEpisodeModal
+        isOpen={showSeasonEpisode}
+        onClose={closeSeasonEpisode}
+        content={selectedContent}
+        onPlayEpisode={handlePlayEpisode}
+      />
+
       <VideoPlayerModal
         isOpen={showPlayer}
         onClose={() => setShowPlayer(false)}
         content={selectedContent}
+        season={selectedSeason}
+        episode={selectedEpisode}
       />
 
       <ContentDetailsModal
