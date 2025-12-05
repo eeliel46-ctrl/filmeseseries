@@ -33,12 +33,30 @@ export default function SignInPage() {
     setLoading(true)
 
     try {
-      // Let NextAuth handle the redirect - this prevents timing issues with session
-      await signIn('credentials', {
+      // Use redirect: false to handle errors locally
+      const result = await signIn('credentials', {
         email,
         password,
-        callbackUrl: callbackUrl,
+        redirect: false,
       })
+
+      if (result?.error) {
+        // Handle specific error cases
+        if (result.error === 'CredentialsSignin') {
+          toast.error('Email ou senha incorretos')
+        } else {
+          toast.error('Erro ao fazer login. Tente novamente.')
+        }
+        setLoading(false)
+        return
+      }
+
+      if (result?.ok) {
+        // Success - redirect to callback URL
+        toast.success('Login realizado com sucesso!')
+        router.push(callbackUrl)
+        router.refresh()
+      }
     } catch (error) {
       console.error('SignIn error:', error)
       toast.error('Erro ao fazer login')

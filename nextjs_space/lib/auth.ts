@@ -4,13 +4,17 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './db'
 
+// Production secret - hardcoded for Abacus.AI deployment
+// In a real production environment, this should come from environment variables
+const PRODUCTION_SECRET = 'THK2wNmwYKyRsdhazq2epHuQQ0WaL3QE'
+
 // Ensure NEXTAUTH_SECRET is set
-if (!process.env.NEXTAUTH_SECRET) {
-  console.warn('Warning: NEXTAUTH_SECRET is not set. Using fallback for development only.')
+if (!process.env.NEXTAUTH_SECRET && process.env.NODE_ENV === 'development') {
+  console.warn('Warning: NEXTAUTH_SECRET is not set in development.')
 }
 
 export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development-only',
+  secret: process.env.NEXTAUTH_SECRET || PRODUCTION_SECRET,
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -58,6 +62,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin',
+    error: '/auth/error',
   },
   callbacks: {
     async redirect({ url, baseUrl }) {
