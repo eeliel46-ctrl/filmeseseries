@@ -45,6 +45,7 @@ export function Header() {
 
   const navItems = [
     { name: 'Início', href: '/' },
+    { name: 'TV Ao Vivo', href: '/canais' },
     { name: 'Séries', href: '/series' },
     { name: 'Filmes', href: '/movies' },
     { name: 'Bombando', href: '/lancamentos' },
@@ -72,6 +73,19 @@ export function Header() {
           <nav className="hidden lg:flex items-center space-x-7">
             <Link href="/" className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors hover:text-white ${pathname === '/' ? 'text-white' : 'text-white/50'}`}>Início</Link>
             
+            <Link 
+              href="/canais" 
+              className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors hover:text-white flex items-center gap-1.5 ${
+                pathname === '/canais' ? 'text-white' : 'text-white/50'
+              }`}
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+              </span>
+              TV Ao Vivo
+            </Link>
+
             {/* Restored Genre Dropdowns */}
             <DropdownMenu>
               <DropdownMenuTrigger className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors hover:text-white flex items-center gap-1 ${pathname.startsWith('/series') ? 'text-white' : 'text-white/50'}`}>

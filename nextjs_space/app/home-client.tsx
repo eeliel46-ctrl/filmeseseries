@@ -9,6 +9,7 @@ import { ContentRow } from '@/components/ui/content-row'
 import { TodayEpisodesRow } from '@/components/ui/today-episodes-row'
 import { ContinueWatchingRow } from '@/components/ui/continue-watching-row'
 import { CategoryVault } from '@/components/ui/category-vault'
+import { LiveChannelsRow } from '@/components/ui/live-channels-row'
 import { VideoPlayerModal } from '@/components/ui/video-player-modal'
 import { SeasonEpisodeModal } from '@/components/ui/season-episode-modal'
 import { ContentDetailsModal } from '@/components/ui/content-details-modal'
@@ -159,6 +160,9 @@ export function HomeClient() {
             onPlayEpisode={handlePlayDirect}
             onViewDetails={handleViewDetails}
           />
+
+          {/* TV Ao Vivo & Canais VIP Section */}
+          <LiveChannelsRow />
 
           {/* Trending Row - Reversa Selection */}
           <ContentRow
