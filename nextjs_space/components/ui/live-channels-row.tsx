@@ -43,13 +43,13 @@ export function LiveChannelsRow() {
             onClick={() => setSelectedChannel(channel)}
             className="group relative flex flex-col bg-zinc-900/60 hover:bg-zinc-800/80 border border-white/10 hover:border-red-500/50 rounded-2xl p-3 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-red-600/20 hover:-translate-y-1"
           >
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-950 flex items-center justify-center mb-2.5">
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950 border border-white/5 flex items-center justify-center p-3 mb-2.5">
               <img
                 src={channel.logo}
                 alt={channel.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80 group-hover:opacity-100"
+                className="max-h-14 max-w-[80%] object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
               {/* Badge */}
               <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-bold shadow">
@@ -57,12 +57,12 @@ export function LiveChannelsRow() {
                 LIVE
               </div>
 
-              <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-zinc-300 font-mono text-[9px] font-bold">
+              <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-zinc-300 font-mono text-[9px] font-bold">
                 {channel.quality}
               </div>
 
               {/* Play hover */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-[1px]">
                 <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
                   <Play className="w-4 h-4 ml-0.5 fill-current" />
                 </div>

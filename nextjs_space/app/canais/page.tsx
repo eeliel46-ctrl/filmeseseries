@@ -111,13 +111,13 @@ export default function CanaisPage() {
                   onClick={() => setActiveChannel(featuredChannel)}
                   className="group relative rounded-2xl overflow-hidden border border-white/15 bg-zinc-900/60 p-4 sm:p-5 backdrop-blur-xl shadow-2xl hover:border-red-500/50 transition-all cursor-pointer"
                 >
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-black/80 flex items-center justify-center">
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-b from-zinc-900 to-black border border-white/10 flex items-center justify-center p-6">
                     <img
                       src={featuredChannel.logo}
                       alt={featuredChannel.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80 group-hover:opacity-90"
+                      className="max-h-24 max-w-[70%] object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent pointer-events-none" />
 
                     {/* Live Badge */}
                     <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600 text-white text-[11px] font-bold shadow-lg">
@@ -252,13 +252,13 @@ export default function CanaisPage() {
                   className="group relative flex flex-col bg-zinc-900/40 hover:bg-zinc-800/60 border border-white/10 hover:border-red-500/50 rounded-2xl p-3 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-red-600/10 hover:-translate-y-1"
                 >
                   {/* Thumbnail / Logo Container */}
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-950 flex items-center justify-center mb-3">
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950 border border-white/5 flex items-center justify-center p-3 mb-3">
                     <img
                       src={channel.logo}
                       alt={channel.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-75 group-hover:opacity-100"
+                      className="max-h-16 max-w-[80%] object-contain group-hover:scale-110 transition-transform duration-300 drop-shadow-md"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
 
                     {/* Top Badges */}
                     <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-600 text-white text-[9px] font-bold shadow">
@@ -266,13 +266,13 @@ export default function CanaisPage() {
                       LIVE
                     </div>
 
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-zinc-300 font-mono text-[9px] font-bold">
+                    <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-md border border-white/10 text-zinc-300 font-mono text-[9px] font-bold">
                       {channel.quality}
                     </div>
 
                     {/* Play Button Overlay on Hover */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-                      <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 backdrop-blur-[1px]">
+                      <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shadow-xl transform group-hover:scale-110 transition-transform">
                         <Play className="w-4 h-4 ml-0.5 fill-current" />
                       </div>
                     </div>

@@ -1,7 +1,20 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { X, Maximize, RotateCw, Tv, Radio, ShieldCheck, Sparkles, Volume2, ChevronRight, Play } from 'lucide-react'
+import {
+  X,
+  Maximize,
+  RotateCw,
+  Tv,
+  Radio,
+  ShieldCheck,
+  Sparkles,
+  Volume2,
+  ChevronRight,
+  Play,
+  AlertCircle,
+  ExternalLink
+} from 'lucide-react'
 import { Channel, CHANNELS_DATA } from '@/lib/channels-data'
 import { Button } from '@/components/ui/button'
 
@@ -18,6 +31,8 @@ export function LiveTvPlayerModal({
 }: LiveTvPlayerModalProps) {
   const [selectedServerIndex, setSelectedServerIndex] = useState(0)
   const [isIframeLoaded, setIsIframeLoaded] = useState(false)
+  const [hasError, setHasError] = useState(false)
+  const [useProxy, setUseProxy] = useState(false)
   const [keyReload, setKeyReload] = useState(0)
   const [showChannelList, setShowChannelList] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
@@ -25,6 +40,8 @@ export function LiveTvPlayerModal({
   useEffect(() => {
     setSelectedServerIndex(0)
     setIsIframeLoaded(false)
+    setHasError(false)
+    setUseProxy(false)
     setKeyReload(0)
   }, [channel?.id])
 
@@ -42,9 +59,29 @@ export function LiveTvPlayerModal({
 
   const currentServer = channel.servers[selectedServerIndex] || channel.servers[0]
 
+  // If using internal proxy to strip referrers and headers
+  const finalStreamUrl = useProxy
+    ? `/api/player/proxy?url=${encodeURIComponent(currentServer.url)}`
+    : currentServer.url
+
   const handleReload = () => {
     setIsIframeLoaded(false)
+    setHasError(false)
     setKeyReload((prev) => prev + 1)
+  }
+
+  const handleToggleProxy = () => {
+    setUseProxy((prev) => !prev)
+    handleReload()
+  }
+
+  const handleNextServer = () => {
+    if (channel.servers.length > 1) {
+      const nextIndex = (selectedServerIndex + 1) % channel.servers.length
+      setSelectedServerIndex(nextIndex)
+      setIsIframeLoaded(false)
+      setHasError(false)
+    }
   }
 
   const handleFullscreen = () => {
@@ -60,10 +97,10 @@ export function LiveTvPlayerModal({
   ).slice(0, 8)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-6xl max-h-[95vh] flex flex-col bg-[#0f0f14] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-6xl max-h-[95vh] flex flex-col bg-[#0c0c12] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         {/* Top Bar */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-zinc-900 via-black to-zinc-900 border-b border-white/10">
+        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-2.5 py-1 bg-red-600/20 border border-red-500/40 rounded-full">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
@@ -71,10 +108,10 @@ export function LiveTvPlayerModal({
               <span className="text-xs font-bold text-red-400 uppercase tracking-wider">AO VIVO</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs px-2 py-0.5 rounded bg-white/10 text-zinc-300 font-bold">
-                {channel.number || 'TV'}
-              </span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg overflow-hidden bg-black/80 p-0.5 border border-white/10 flex items-center justify-center">
+                <img src={channel.logo} alt={channel.name} className="w-full h-full object-contain" />
+              </div>
               <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
                 {channel.name}
                 <span className="text-[10px] px-1.5 py-0.5 rounded font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -127,27 +164,57 @@ export function LiveTvPlayerModal({
         </div>
 
         {/* Player Container */}
-        <div className="relative flex-1 bg-black min-h-[300px] sm:min-h-[450px] md:min-h-[520px] flex items-center justify-center overflow-hidden">
-          {!isIframeLoaded && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-sm gap-3">
+        <div className="relative flex-1 bg-black min-h-[320px] sm:min-h-[460px] md:min-h-[540px] flex items-center justify-center overflow-hidden">
+          {!isIframeLoaded && !hasError && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-950/90 backdrop-blur-sm gap-3">
               <div className="w-12 h-12 rounded-full border-4 border-red-500/20 border-t-red-500 animate-spin" />
               <div className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                 <Radio className="w-4 h-4 text-red-500 animate-pulse" />
-                Conectando ao sinal de {channel.name}...
+                Sintonizando {channel.name} ({currentServer.name})...
               </div>
             </div>
           )}
 
-          {currentServer && (
+          {hasError ? (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-950 p-6 text-center gap-4">
+              <AlertCircle className="w-12 h-12 text-red-500 animate-bounce" />
+              <div>
+                <h3 className="text-base font-bold text-white">Instabilidade no Servidor Atual</h3>
+                <p className="text-xs text-zinc-400 mt-1 max-w-md">
+                  Este sinal de transmissão está com lentidão ou bloqueio temporário. Tente alternar para outro servidor disponível.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 justify-center">
+                <Button
+                  size="sm"
+                  onClick={handleNextServer}
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold"
+                >
+                  <RotateCw className="w-3.5 h-3.5 mr-1.5" />
+                  Trocar para Próximo Servidor
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleToggleProxy}
+                  className="border-white/10 text-xs"
+                >
+                  {useProxy ? 'Desativar Modo Proxy' : 'Ativar Modo Proxy Seguro'}
+                </Button>
+              </div>
+            </div>
+          ) : (
             <iframe
-              key={`${currentServer.url}-${keyReload}`}
+              key={`${finalStreamUrl}-${keyReload}`}
               ref={iframeRef}
-              src={currentServer.url}
+              src={finalStreamUrl}
               title={channel.name}
               className="w-full h-full border-0 absolute inset-0"
               allowFullScreen
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              referrerPolicy="no-referrer"
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen; screen-wake-lock"
               onLoad={() => setIsIframeLoaded(true)}
+              onError={() => setHasError(true)}
             />
           )}
 
@@ -158,9 +225,9 @@ export function LiveTvPlayerModal({
                 <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Canais Similares</h3>
                 <button
                   onClick={() => setShowChannelList(false)}
-                  className="text-zinc-400 hover:text-white text-xs"
+                  className="text-zinc-400 hover:text-white text-xs font-bold"
                 >
-                  Fechar
+                  ✕ Fechar
                 </button>
               </div>
               <div className="space-y-2">
@@ -173,8 +240,8 @@ export function LiveTvPlayerModal({
                     }}
                     className="w-full flex items-center gap-3 p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-left group"
                   >
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-black/60 flex-shrink-0 flex items-center justify-center border border-white/10">
-                      <img src={c.logo} alt={c.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-black/90 p-1 flex-shrink-0 flex items-center justify-center border border-white/10">
+                      <img src={c.logo} alt={c.name} className="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold text-white truncate">{c.name}</div>
@@ -189,7 +256,7 @@ export function LiveTvPlayerModal({
         </div>
 
         {/* Bottom Control & Server Switcher */}
-        <div className="p-3 sm:p-4 bg-zinc-900/90 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="p-3 sm:p-4 bg-zinc-950 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold text-zinc-400 flex items-center gap-1.5 mr-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Servidores:
@@ -201,6 +268,7 @@ export function LiveTvPlayerModal({
                   if (selectedServerIndex !== index) {
                     setSelectedServerIndex(index)
                     setIsIframeLoaded(false)
+                    setHasError(false)
                   }
                 }}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
@@ -214,11 +282,13 @@ export function LiveTvPlayerModal({
             ))}
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-zinc-400 truncate max-w-full">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-            <span className="truncate">
-              No ar: <strong className="text-zinc-200">{channel.currentProgram || channel.description}</strong>
-            </span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-xs text-zinc-400 truncate max-w-full">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+              <span className="truncate">
+                No ar: <strong className="text-zinc-200">{channel.currentProgram || channel.description}</strong>
+              </span>
+            </div>
           </div>
         </div>
       </div>
