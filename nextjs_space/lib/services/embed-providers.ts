@@ -17,12 +17,27 @@ export interface EmbedProvider {
 
 export const embedProviders: EmbedProvider[] = [
   {
+    id: 'embedplay',
+    name: 'EmbedPlay VIP',
+    icon: '💎',
+    quality: '1080p / 4K',
+    tags: ['Autoplay Ativo', 'Filmes • Séries • Anime', 'Alta Velocidade'],
+    description: 'Servidor oficial de alta performance com catálogo completo de animes, séries e filmes.',
+    getMovieUrl: (tmdbId: string, imdbId?: string) => {
+      return `https://embedplayapi.top/embed/${tmdbId || imdbId}`
+    },
+    getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
+      return `https://embedplayapi.top/embed/${tmdbId || imdbId}/${season}/${episode}`
+    },
+    supportsSandbox: false,
+  },
+  {
     id: 'playerflix',
     name: 'PlayerFlix Ultra',
     icon: '⚡',
     quality: '1080p / 4K',
-    tags: ['Autoplay Ativo', 'Sem Anúncios', 'Alta Velocidade'],
-    description: 'Servidor principal otimizado para streaming limpo com autoplay imediato.',
+    tags: ['Autoplay Ativo', 'Sem Anúncios', 'Servidor BR'],
+    description: 'Servidor otimizado para streaming limpo com reprodução veloz.',
     getMovieUrl: (tmdbId: string, imdbId?: string) => {
       const id = imdbId || tmdbId
       return `https://playerflixapi.com/filme/${id}?autoplay=1`
@@ -30,71 +45,52 @@ export const embedProviders: EmbedProvider[] = [
     getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
       return `https://playerflixapi.com/serie/${tmdbId}/${season}/${episode}?autoplay=1`
     },
-    supportsSandbox: true,
+    supportsSandbox: false,
   },
   {
-    id: 'superflix',
-    name: 'SuperFlix SBS',
-    icon: '🇧🇷',
+    id: '2embed',
+    name: '2Embed / VidSrc HD',
+    icon: '🎬',
     quality: 'Full HD',
-    tags: ['Autoplay Ativo', 'Dublado & Legendado', 'Servidor BR'],
-    description: 'Excelente disponibilidade em português com autoplay e seleção de áudio.',
-    getMovieUrl: (tmdbId: string, imdbId?: string) => {
-      const id = imdbId || tmdbId
-      return `https://superflixapi.sbs/filme/${id}#autoplay=true&noLink&color:E50914`
+    tags: ['Direto Sem Erro', 'Anime • Filmes • Séries', 'Multi-idioma'],
+    description: 'Servidor internacional de alta estabilidade com reprodução direta sem bloqueios de sandbox.',
+    getMovieUrl: (tmdbId: string) => {
+      return `https://vidsrc.buzz/embed/movie/${tmdbId}`
     },
     getSeriesUrl: (tmdbId: string, season: number, episode: number) => {
-      return `https://superflixapi.sbs/serie/${tmdbId}/${season}/${episode}#autoplay=true&noLink&color:E50914`
+      return `https://vidsrc.buzz/embed/tv/${tmdbId}/${season}/${episode}`
     },
     supportsSandbox: false,
   },
   {
-    id: 'multiembed',
-    name: 'MultiEmbed VIP',
+    id: 'vidlink',
+    name: 'VidLink Pro',
     icon: '🚀',
     quality: '1080p HD',
-    tags: ['Multi-Stream', 'Alta Estabilidade'],
-    description: 'Rede multi-servidores com sincronização instantânea de episódios.',
-    getMovieUrl: (tmdbId: string, imdbId?: string) => {
-      return `https://multiembed.mov/?video_id=${imdbId || tmdbId}&tmdb=1&autoplay=1`
-    },
-    getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
-      return `https://multiembed.mov/?video_id=${imdbId || tmdbId}&tmdb=1&s=${season}&e=${episode}&autoplay=1`
-    },
-    supportsSandbox: true,
-  },
-  {
-    id: '2embed',
-    name: '2Embed HD',
-    icon: '🎬',
-    quality: 'HD',
-    tags: ['Autoplay Ativo', 'Multi-idioma'],
-    description: 'Servidor alternativo com ampla cobertura e reprodução automática.',
+    tags: ['Multi-Stream', 'Alta Estabilidade', 'Anime'],
+    description: 'Servidor alternativo de alta velocidade com suporte completo a animes, séries e filmes.',
     getMovieUrl: (tmdbId: string) => {
-      return `https://www.2embed.cc/embed/${tmdbId}?autoplay=1`
+      return `https://vidlink.pro/movie/${tmdbId}`
     },
     getSeriesUrl: (tmdbId: string, season: number, episode: number) => {
-      return `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}&autoplay=1`
+      return `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}`
     },
-    supportsSandbox: true,
+    supportsSandbox: false,
   },
   {
     id: 'vidsrc',
     name: 'VidSrc Backup',
     icon: '📺',
     quality: 'HD',
-    tags: ['Autoplay Ativo', 'Backup Internacional'],
-    description: 'Servidor de contingência global com legendas e autoplay.',
+    tags: ['Backup Global', 'Multi-idioma'],
+    description: 'Servidor de contingência global para filmes e séries.',
     getMovieUrl: (tmdbId: string, imdbId?: string) => {
-      if (imdbId) {
-        return `https://vidsrcme.ru/embed/movie?imdb=${imdbId}&autoplay=1`
-      }
       return `https://vidsrc.to/embed/movie/${tmdbId}?autoplay=1`
     },
     getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
-      return `https://vidsrcme.ru/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${episode}&autoplay=1`
+      return `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}?autoplay=1`
     },
-    supportsSandbox: true,
+    supportsSandbox: false,
   },
 ]
 

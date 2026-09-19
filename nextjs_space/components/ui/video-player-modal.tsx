@@ -437,7 +437,7 @@ export function VideoPlayerModal({
               )}
             </AnimatePresence>
 
-            {/* Sandboxed Secure Player Frame with Full Autoplay Permissions */}
+            {/* Secure High-Performance Player Frame with Full Autoplay Permissions */}
             {playerUrl && !iframeError ? (
               <iframe
                 ref={iframeRef}
@@ -445,9 +445,9 @@ export function VideoPlayerModal({
                 src={playerUrl}
                 className="w-full h-full border-0"
                 allowFullScreen
-                allow="autoplay *; fullscreen *; encrypted-media *; picture-in-picture *; accelerometer *; gyroscope *; camera *; microphone *"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-downloads"
-                referrerPolicy="origin"
+                allow="autoplay *; fullscreen *; encrypted-media *; picture-in-picture *; accelerometer *; gyroscope *"
+                sandbox={currentProvider.supportsSandbox ? "allow-scripts allow-same-origin allow-forms allow-presentation allow-downloads" : undefined}
+                referrerPolicy="no-referrer-when-downgrade"
                 title={`Reproduzindo ${content.title}`}
                 style={{ border: 'none' }}
               />

@@ -143,8 +143,11 @@ export async function GET(request: NextRequest) {
     html = html.replace(/<script[^>]*src=['"]https?:\/\/[^'"]*popunder[^'"]*['"][^>]*><\/script>/gi, '')
     html = html.replace(/<script[^>]*src=['"]https?:\/\/[^'"]*\.php\?[^'"]*['"][^>]*><\/script>/gi, '')
 
-    // 2. Bypass sandbox check in 2embed outer page
-    html = html.replace('function isReallySandboxed()', 'function isReallySandboxed(){return false;} function _original_isReallySandboxed()')
+    // 2. Bypass sandbox check in 2embed outer page completely
+    html = html.replace(/function\s+isReallySandboxed\s*\(\s*\)/g, 'function isReallySandboxed(){return false;} function _orig_isReallySandboxed()')
+    html = html.replace(/isReallySandboxed\(\)/g, 'false')
+    // Hide sandbox error overlay if any CSS/DOM was rendered
+    html = html.replace(/<style>/i, '<style>#sbxErr, .sbx-err-container { display: none !important; visibility: hidden !important; opacity: 0 !important; } ')
 
     // 3. Inject base tag so relative links resolve correctly to original server
     const baseTag = `<base href="${targetUrl}">`
