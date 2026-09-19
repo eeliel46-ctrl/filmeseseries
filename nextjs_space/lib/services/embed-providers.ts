@@ -21,7 +21,7 @@ export const embedProviders: EmbedProvider[] = [
     name: 'EmbedPlay VIP',
     icon: '💎',
     quality: '1080p / 4K',
-    tags: ['Autoplay Ativo', 'Filmes • Séries • Anime', 'Alta Velocidade'],
+    tags: ['Autoplay Ativo', 'Anti-Popups', 'Alta Velocidade'],
     description: 'Servidor oficial de alta performance com catálogo completo de animes, séries e filmes.',
     getMovieUrl: (tmdbId: string, imdbId?: string) => {
       return `https://embedplayapi.top/embed/${tmdbId || imdbId}`
@@ -29,7 +29,7 @@ export const embedProviders: EmbedProvider[] = [
     getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
       return `https://embedplayapi.top/embed/${tmdbId || imdbId}/${season}/${episode}`
     },
-    supportsSandbox: false,
+    supportsSandbox: true,
   },
   {
     id: 'playerflix',
@@ -45,14 +45,14 @@ export const embedProviders: EmbedProvider[] = [
     getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
       return `https://playerflixapi.com/serie/${tmdbId}/${season}/${episode}?autoplay=1`
     },
-    supportsSandbox: false,
+    supportsSandbox: true,
   },
   {
     id: '2embed',
     name: '2Embed / VidSrc HD',
     icon: '🎬',
     quality: 'Full HD',
-    tags: ['Direto Sem Erro', 'Anime • Filmes • Séries', 'Multi-idioma'],
+    tags: ['Anti-Popups', 'Anime • Filmes • Séries', 'Multi-idioma'],
     description: 'Servidor internacional de alta estabilidade com reprodução direta sem bloqueios de sandbox.',
     getMovieUrl: (tmdbId: string) => {
       return `https://vidsrc.buzz/embed/movie/${tmdbId}`
@@ -60,7 +60,7 @@ export const embedProviders: EmbedProvider[] = [
     getSeriesUrl: (tmdbId: string, season: number, episode: number) => {
       return `https://vidsrc.buzz/embed/tv/${tmdbId}/${season}/${episode}`
     },
-    supportsSandbox: false,
+    supportsSandbox: true,
   },
   {
     id: 'vidlink',
@@ -75,7 +75,7 @@ export const embedProviders: EmbedProvider[] = [
     getSeriesUrl: (tmdbId: string, season: number, episode: number) => {
       return `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}`
     },
-    supportsSandbox: false,
+    supportsSandbox: true,
   },
   {
     id: 'vidsrc',
@@ -90,7 +90,7 @@ export const embedProviders: EmbedProvider[] = [
     getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
       return `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}?autoplay=1`
     },
-    supportsSandbox: false,
+    supportsSandbox: true,
   },
 ]
 

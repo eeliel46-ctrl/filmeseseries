@@ -45,7 +45,7 @@ export function VideoPlayerModal({
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Block popup attempts on parent window while modal is open
+  // Intelligent Anti-Popup Shield: Blocks any popup attempts or tab escapes
   useEffect(() => {
     if (isOpen) {
       const originalOpen = window.open
@@ -55,14 +55,23 @@ export function VideoPlayerModal({
           close: () => {},
           focus: () => {},
           blur: () => {},
+          location: { href: '' },
+          document: { write: () => {} }
         } as any
       }
 
+      // Prevent window blur / unfocus tricks often used by ad networks
+      const handleWindowBlur = () => {
+        window.focus()
+      }
+
       const handleBeforeUnload = () => {}
+      window.addEventListener('blur', handleWindowBlur)
       window.addEventListener('beforeunload', handleBeforeUnload)
 
       return () => {
         window.open = originalOpen
+        window.removeEventListener('blur', handleWindowBlur)
         window.removeEventListener('beforeunload', handleBeforeUnload)
       }
     }
