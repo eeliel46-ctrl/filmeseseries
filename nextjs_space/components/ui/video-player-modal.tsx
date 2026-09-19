@@ -91,13 +91,24 @@ export function VideoPlayerModal({
       }
     }
 
+    const handleBlur = () => {
+      // Guard against pop-under tab stealing
+      setTimeout(() => {
+        if (isOpen) {
+          window.focus()
+        }
+      }, 50)
+    }
+
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown)
+      window.addEventListener('blur', handleBlur)
       document.body.style.overflow = 'hidden'
     }
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('blur', handleBlur)
       document.body.style.overflow = 'unset'
     }
   }, [isOpen, onClose])
@@ -446,7 +457,7 @@ export function VideoPlayerModal({
               )}
             </AnimatePresence>
 
-            {/* Secure High-Performance Player Frame with Full Autoplay Permissions */}
+            {/* Secure Clean Player Frame mirroring DioneyFlix strict permission policy */}
             {playerUrl && !iframeError ? (
               <iframe
                 ref={iframeRef}
@@ -454,9 +465,9 @@ export function VideoPlayerModal({
                 src={playerUrl}
                 className="w-full h-full border-0"
                 allowFullScreen
-                allow="autoplay *; fullscreen *; encrypted-media *; picture-in-picture *; accelerometer *; gyroscope *"
-                sandbox={currentProvider.supportsSandbox ? "allow-scripts allow-same-origin allow-forms allow-presentation allow-downloads" : undefined}
-                referrerPolicy="no-referrer-when-downgrade"
+                allow="autoplay; encrypted-media; fullscreen"
+                referrerPolicy="no-referrer"
+                scrolling="no"
                 title={`Reproduzindo ${content.title}`}
                 style={{ border: 'none' }}
               />
