@@ -192,28 +192,77 @@ export async function GET(request: NextRequest) {
         return new NextResponse(JSON.stringify({ error: 'Target URL required' }), { status: 400 })
       }
 
-      // Reconstruct target URL with remaining query params
-      const targetObj = new URL(targetUrl)
+      // Ensure target URL points to correct AJAX endpoint
+      let targetPath = targetUrl
+      if (action === 'ajax' && !targetPath.includes('/ajax/') && !targetPath.includes('.php')) {
+        targetPath = targetPath.replace(/\/?$/, '/ajax/get_stream_link')
+      }
+      const targetObj = new URL(targetPath)
+
       searchParams.forEach((value, key) => {
         if (key !== 'action' && key !== 'target' && key !== 'url' && key !== 'referer') {
           targetObj.searchParams.set(key, value)
         }
       })
 
-      const referer = refererParam || `${targetObj.origin}/`
+      // Determine the target embed page URL for accurate server fallback
+      let embedPageUrl: string | undefined = refererParam || undefined
+      if (!embedPageUrl) {
+        const reqReferer = request.headers.get('referer') || ''
+        if (reqReferer.includes('url=')) {
+          try {
+            const parsed = new URL(reqReferer)
+            embedPageUrl = parsed.searchParams.get('url') || undefined
+          } catch(e) {}
+        }
+      }
+      const referer = embedPageUrl || `${targetObj.origin}/`
 
-      const ajaxRes = await axios.get(targetObj.toString(), {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'application/json, text/javascript, */*; q=0.01',
-          'X-Requested-With': 'XMLHttpRequest',
-          'Referer': referer
-        },
-        responseType: 'json',
-        timeout: 10000
-      })
+      let data: any = null
+      try {
+        const ajaxRes = await axios.get(targetObj.toString(), {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Referer': referer
+          },
+          responseType: 'json',
+          timeout: 10000
+        })
+        data = ajaxRes.data
+      } catch (err: any) {
+        console.warn('Initial AJAX fetch failed:', err.message)
+      }
 
-      const data = ajaxRes.data
+      // If data returned unknown error (e.g. invalid server id '_default'), automatically resolve the real server ID from embed page
+      if (!data || !data.success) {
+        try {
+          const pageRes = await axios.get(referer, {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+            timeout: 8000
+          })
+          const serverMatches = [...pageRes.data.matchAll(/class=["'][^"']*server\b[^"']*["'][^>]*data-id=["']([^"']+)["']/g)]
+          const realServerId = serverMatches.find(m => m[1] !== '_default')?.[1]
+          if (realServerId) {
+            targetObj.searchParams.set('id', realServerId)
+            const retryRes = await axios.get(targetObj.toString(), {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Referer': referer
+              },
+              responseType: 'json',
+              timeout: 8000
+            })
+            data = retryRes.data
+          }
+        } catch (retryErr: any) {
+          console.error('Retry server resolution error:', retryErr.message)
+        }
+      }
 
       // If response contains stream link, rewrite it through our proxy
       if (data && typeof data === 'object') {
@@ -225,7 +274,7 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      return NextResponse.json(data, {
+      return NextResponse.json(data || { success: false, error: 'Unable to resolve stream' }, {
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -334,6 +383,30 @@ export async function GET(request: NextRequest) {
     html = html.replace(/src=["'](https?:\/\/abysscdn\.com\/[^"']+)["']/gi, (match: string, p1: string) => {
       return `src="/api/player/proxy?url=${encodeURIComponent(p1)}&referer=${encodeURIComponent(targetUrl)}"`
     })
+
+    // 11. Inject auto-start script to guarantee instant stream start
+    const autoPlayScript = `
+    <script>
+      (function() {
+        function triggerPlayer() {
+          try {
+            var realServer = document.querySelector('.server[data-id]:not([data-id="_default"])');
+            if (realServer && typeof Player !== 'undefined' && Player.play) {
+              Player.play(false, realServer);
+            }
+          } catch(e) {}
+        }
+        document.addEventListener('DOMContentLoaded', triggerPlayer);
+        setTimeout(triggerPlayer, 200);
+        setTimeout(triggerPlayer, 600);
+      })();
+    </script>
+    `
+    if (html.includes('</body>')) {
+      html = html.replace('</body>', autoPlayScript + '</body>')
+    } else {
+      html = html + autoPlayScript
+    }
 
     return new NextResponse(html, {
       headers: {
