@@ -24,12 +24,10 @@ export const embedProviders: EmbedProvider[] = [
     tags: ['Autoplay Ativo', 'Anti-Popups', 'Alta Velocidade'],
     description: 'Servidor oficial de alta performance com catálogo completo de animes, séries e filmes.',
     getMovieUrl: (tmdbId: string, imdbId?: string) => {
-      const direct = `https://embedplayapi.top/embed/${tmdbId || imdbId}`
-      return `/api/player/proxy?url=${encodeURIComponent(direct)}`
+      return `https://embedplayapi.top/embed/${tmdbId || imdbId}`
     },
     getSeriesUrl: (tmdbId: string, season: number, episode: number, imdbId?: string) => {
-      const direct = `https://embedplayapi.top/embed/${tmdbId || imdbId}/${season}/${episode}`
-      return `/api/player/proxy?url=${encodeURIComponent(direct)}`
+      return `https://embedplayapi.top/embed/${tmdbId || imdbId}/${season}/${episode}`
     },
     supportsSandbox: false,
   },
